@@ -1,14 +1,12 @@
 package client;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
-public class LoginProcess extends JFrame
-{
+public class LoginProcess extends JFrame {
     private static final long serialVersionUID = 1L;
 
-    public LoginProcess(int number)
-    {
+    public LoginProcess(int number) {
         super();
         setTitle("Login");
         JLabel imageLable = new JLabel();

@@ -1,11 +1,5 @@
 package client;
 
-import readThread.ClientMessageThread;
-import stream.ClientClientConnection;
-import tools.MyMap;
-import user.UserInfo;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,9 +12,13 @@ import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.swing.*;
+import readThread.ClientMessageThread;
+import stream.ClientClientConnection;
+import tools.MyMap;
+import user.UserInfo;
 
-public class ClientFrame extends JFrame implements ActionListener
-{
+public class ClientFrame extends JFrame implements ActionListener {
     private static final long serialVersionUID = 1L;
     private JTextArea chatTextArea;
     private JButton send;
@@ -35,27 +33,21 @@ public class ClientFrame extends JFrame implements ActionListener
 
     // 姓名 账户 IP
     public ClientFrame(UserInfo toUserInfo, UserInfo myUserInfo, MyMap isOpenMap)
-            throws HeadlessException
-    {
+            throws HeadlessException {
         super("Chatting with" + toUserInfo.getName() + "(" + toUserInfo.getAccount() + ")");
         this.toUserInfo = toUserInfo;
         this.myUserInfo = myUserInfo;
         this.isOpenMap = isOpenMap;
         DatagramSocket dataSocket = null;
-        try
-        {
+        try {
             dataSocket = new DatagramSocket();
-
-        } catch (SocketException e)
-        {
+        } catch (SocketException e) {
             e.printStackTrace();
         }
-        try
-        {
+        try {
             userDataCS = new ClientClientConnection(dataSocket, InetAddress.getByName(toUserInfo.getIP()),
                     toUserInfo.getPort());
-        } catch (UnknownHostException e)
-        {
+        } catch (UnknownHostException e) {
             e.printStackTrace();
         }
         userDataCS.send("%TEST%");
@@ -65,8 +57,7 @@ public class ClientFrame extends JFrame implements ActionListener
         addEventHandler();
     }
 
-    private void createFrame()
-    {
+    private void createFrame() {
         chatTextArea = new JTextArea(25, 60);
         chatTextArea.setEditable(false);
         JTextArea userInfoListArea = new JTextArea();
@@ -100,17 +91,13 @@ public class ClientFrame extends JFrame implements ActionListener
     }
 
     @Override
-    public void actionPerformed(ActionEvent e)
-    {
+    public void actionPerformed(ActionEvent e) {
         String message = inputField.getText();
-        if (message == null || message.trim().equals(""))
-        {
+        if (message == null || message.trim().equals("")) {
             JOptionPane.showMessageDialog(this, "You cannot send empty message!");
-        } else
-        {
+        } else {
             String time = simpleDateFormat.format(new Date());
-            if (userDataCS != null)
-            {
+            if (userDataCS != null) {
                 userDataCS.send(myUserInfo.getName() + "-" + myUserInfo.getAccount() + "-"
                         + myUserInfo.getUserPortraitNum() + "-" + myUserInfo.getRecenIP() + "-"
                         + myUserInfo.getRecentPort() + "-" + "(" + time + ")\n" + message);
@@ -120,24 +107,18 @@ public class ClientFrame extends JFrame implements ActionListener
         }
     }
 
-    private void addEventHandler()
-    {
+    private void addEventHandler() {
         inputField.addActionListener(this);
         send.addActionListener(this);
-        addWindowListener(new WindowAdapter()
-        {
+        addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e)
-            {
+            public void windowClosing(WindowEvent e) {
                 int t = JOptionPane.showConfirmDialog(null, "Confirm to exit?", "Exit", JOptionPane.OK_CANCEL_OPTION);
-                if (t == JOptionPane.OK_OPTION)
-                {
+                if (t == JOptionPane.OK_OPTION) {
                     userDataCS.send("I_HAVE_EXIT_THE_WINDOW");
-                    try
-                    {
+                    try {
                         Thread.sleep(100);
-                    } catch (InterruptedException e1)
-                    {
+                    } catch (InterruptedException e1) {
                         e1.printStackTrace();
                     }
                     readMessageThread.interrupt();
@@ -149,8 +130,7 @@ public class ClientFrame extends JFrame implements ActionListener
         });
     }
 
-    public ClientFrame showMe()
-    {
+    public ClientFrame showMe() {
         pack();
         setVisible(true);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -160,13 +140,11 @@ public class ClientFrame extends JFrame implements ActionListener
         return this;
     }
 
-    public JTextArea getChatTextArea()
-    {
+    public JTextArea getChatTextArea() {
         return chatTextArea;
     }
 
-    public ClientClientConnection getUserDataCS()
-    {
+    public ClientClientConnection getUserDataCS() {
         return userDataCS;
     }
 

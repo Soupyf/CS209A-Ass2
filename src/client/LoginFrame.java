@@ -1,9 +1,5 @@
 package client;
 
-import stream.ServerClientConnection;
-import user.UserInfo;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
@@ -12,9 +8,11 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Random;
+import javax.swing.*;
+import stream.ServerClientConnection;
+import user.UserInfo;
 
-public class LoginFrame extends JFrame
-{
+public class LoginFrame extends JFrame {
     private static final long serialVersionUID = 1L;
     private ServerClientConnection userCS;
     private String userName;
@@ -25,19 +23,16 @@ public class LoginFrame extends JFrame
     private JButton login;
     private UserInfo userInfo;
 
-    public LoginFrame() throws HeadlessException
-    {
+    public LoginFrame() throws HeadlessException {
         initData();
         createFrame();
         addHandlerEvent();
     }
 
     @SuppressWarnings("resource")
-    private void initData()
-    {
+    private void initData() {
         userInfo = new UserInfo();
-        try
-        {
+        try {
             DatagramSocket d = new DatagramSocket();
             userPort = d.getLocalPort();
             d.close();
@@ -46,18 +41,15 @@ public class LoginFrame extends JFrame
             int SERVER_PORT = 9000;
             Socket socket = new Socket(SERVER_INETADRESS, SERVER_PORT, LOCAL_INETADRESS, new DatagramSocket().getLocalPort());
             userCS = new ServerClientConnection(socket);
-        } catch (UnknownHostException e)
-        {
+        } catch (UnknownHostException e) {
             e.printStackTrace();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
 
-    private void createFrame()
-    {
+    private void createFrame() {
         setTitle("Login");
         Random random = new Random();
         JLabel imageLable = new JLabel();
@@ -104,34 +96,27 @@ public class LoginFrame extends JFrame
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
-    private void addHandlerEvent()
-    {
+    private void addHandlerEvent() {
         login.addActionListener(arg0 -> {
-            try
-            {
+            try {
                 userCS.send("%LOGIN%:" + InetAddress.getLocalHost().getHostAddress() + ":" + userPort + ":" + ":" + accountField.getText() + ":" + String.valueOf(passwordField.getPassword()).trim()
                         + ":" + userInfo.getUserPortraitNum());
-            } catch (UnknownHostException e)
-            {
+            } catch (UnknownHostException e) {
                 e.printStackTrace();
             }
 
             new Thread(() -> {
-                while (true)
-                {
+                while (true) {
                     message = userCS.read();
-                    if ("LOGIN_FIAL".equals(message))
-                    {
+                    if ("LOGIN_FIAL".equals(message)) {
                         JOptionPane.showMessageDialog(null, "Account Existed!", "Wrong", JOptionPane.WARNING_MESSAGE);
                         accountField.setText("");
                         passwordField.setText("");
-                    } else if ("NAME_IS_NULL".equals(message))
-                    {
+                    } else if ("NAME_IS_NULL".equals(message)) {
                         // setVisible(false);
                         dispose();
                         userName = JOptionPane.showInputDialog(null, "UserName", "Input username", JOptionPane.INFORMATION_MESSAGE);
-                        try
-                        {
+                        try {
                             userCS.send("%LOGIN%:" + InetAddress.getLocalHost().getHostAddress() + ":"
                                     + userPort + ":" + userName + ":" + accountField.getText() + ":"
                                     + String.valueOf(passwordField.getPassword()).trim() + ":"
@@ -139,22 +124,18 @@ public class LoginFrame extends JFrame
                             userInfo.setIP(InetAddress.getLocalHost().getHostAddress());
                             userInfo.setRecenIP(InetAddress.getLocalHost().getHostAddress());
                             userInfo.setRecentPort(userPort);
-                        } catch (UnknownHostException e)
-                        {
+                        } catch (UnknownHostException e) {
                             e.printStackTrace();
                         }
-                    } else if ("LOGIN_SUCESSFULLY".equals(message))
-                    {
+                    } else if ("LOGIN_SUCESSFULLY".equals(message)) {
                         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                         userInfo.setAccount(accountField.getText());
                         userInfo.setName(userName);
                         userInfo.setPort(userPort);
                         LoginProcess loginProcess = new LoginProcess(userInfo.getUserPortraitNum());
-                        try
-                        {
+                        try {
                             Thread.sleep(2000);
-                        } catch (InterruptedException e)
-                        {
+                        } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                         loginProcess.dispose();
